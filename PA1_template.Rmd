@@ -1,25 +1,131 @@
 ---
-title: "Reproducible Research: Peer Assessment 1"
-output: 
+title: 'Reproducible Research: Peer Assessment 1'
+output:
   html_document:
-    keep_md: true
+    keep_md: yes
+  pdf_document: default
+  author   : Abdullah Albyati
 ---
-
-
+```{r setup, cache = FALSE, echo = FALSE, message = FALSE, warning = FALSE, tidy = FALSE}
+require(knitr)
+options(width = 100, 
+        digits = 7)
+opts_chunk$set(message = FALSE, 
+               error = FALSE, 
+               warning = FALSE, 
+               collapse = TRUE, 
+               tidy = FALSE,
+               cache = FALSE, 
+               cache.path = '.cache/', 
+               comment = '#',
+               dpi = 100, 
+               fig.path = 'figures/',
+               dev="png", 
+               dev.args=list(type="cairo"))
+```
+The source files are posted on [GitHub](https://github.com/pedrosan/DataScienceExamples/Human_Activity_1/)
 ## Loading and preprocessing the data
+```{r reading data, echo=TRUE}
+download.file("https://d396qusza40orc.cloudfront.net/repdata%2Fdata%2Factivity.zip", "activity.zip" )
+unzip("activity.zip")
+activity_data <- read.csv("activity.csv")
+```
+### let's have a feel of the activity.csv data frame
+```{r processing data, echo=TRUE}
+summary(activity_data)
+class(activity_data)
+class(activity_data$steps)
+class(activity_data$date)
+class(activity_data$interval)
+```
+### The class of the date column of the data frame is "factor" while it should be "POSIXct" "POSIXt"
+### We will use lubridate package to deal with the date
+```{r date column conversion, echo=TRUE}
+require("lubridate")
+activity_data$date <- ymd(activity_data$date)
+class(activity_data$date)
+```
 
+### What is mean total number of steps taken per day?
+```{r calucalting the mean and median of steps per day, echo=TRUE}
+require("dplyr")
+steps_per_day <- tapply(activity_data$steps, activity_data$date, sum, na.rm = TRUE)
+mean(steps_per_day)
+median(steps_per_day)
+```
+### A Histogram of the total number of steps taking each day
+```{r histogram, echo=TRUE}
+hist1 <- hist(steps_per_day, xlab = "Sum of Steps Per Day", 
+     main = "Histogram of Steps Per Day", 
+     col = "orange",
+     border = "red"
+     )
+```
 
-
-## What is mean total number of steps taken per day?
-
-
-
-## What is the average daily activity pattern?
-
-
+### What is the average daily activity pattern?
+```{r time series plot, echo=TRUE}
+require("ggplot2")
+require("ggthemes")
+time_plot <- ggplot(activity_data, aes(steps, interval))+ geom_line(color="darkblue", size=0.05) +
+xlab("5-Minute Interval") + ylab("Average Number of Steps Taken") + theme_classic() +
+theme_economist() + scale_colour_economist()
+```
+###Which 5-minute interval, on average across all the days in the dataset, contains the maximum number of steps?
+```{r maximum number of steps during 5 minutes intervals, echo=TRUE }
+max_steps <- tapply(activity_data$steps, activity_data$interval, mean, na.rm = TRUE)
+max_steps[which.max(max_steps)]
+```
 
 ## Imputing missing values
+```{r calculating the total number of missing values in the dataset, echo=TRUE}
+sum(is.na(activity_data))
+```
+### Strategy for filling in all the missing values in the data set
+### We will be replacing the missing values in the steps column with the minimum number of steps taking in the data set
+```{r code for replacing NA values, echo=TRUE}
+activity_data_no_NA <- activity_data
+which.min(activity_data$steps)
+#Create a new dataset that is equal to the original dataset but with the missing data filled in.
+activity_data_no_NA[is.na(activity_data_no_NA)] <- 289
+```
 
+### What is mean total number of steps taken per day with NAs replaced?
+```{r calucalting the mean and median of steps per day with NA replaced, echo=TRUE}
+require("dplyr")
+steps_per_day_no_NA <- tapply(activity_data_no_NA$steps, activity_data_no_NA$date, sum)
+mean(steps_per_day_no_NA)
+median(steps_per_day_no_NA)
+```
+### A Histogram of the total number of steps taking each day with NAs replaced 
+```{r histogram with NA replaced, echo=TRUE}
+hist2 <- hist(steps_per_day_no_NA, xlab = "Sum of Steps Per Day", 
+     main = "Histogram of Steps Per Day", 
+     col = "orange",
+     border = "red"
+     )
+```
+
+###Do these values differ from the estimates from the first part of the assignment? What is the impact of imputing missing data on the estimates of the total daily number of steps?
+```{r results='asis', echo=FALSE}
+comparison <- matrix(c("Mean = 9354.23", "Median = 10395", "Mean = 20269.9", "Median = 11458"), ncol = 2)
+colnames(comparison) <- c("Without NAs", "With NAs replaced by 289")
+knitr::kable(comparison, caption = "Comparison Table")
+```
+
+```{r fig.show = 'hold', fig.width = 4, fig.height = 5, echo=FALSE}
+hist(steps_per_day, xlab = "Sum of Steps Per Day", 
+     main = "Histogram of Steps Per Day", 
+     col = "orange",
+     border = "red"
+     )
+
+hist(steps_per_day_no_NA, xlab = "Sum of Steps Per Day with NAs replaced by 289", 
+     main = "Histogram of Steps Per Day", 
+     col = "orange",
+     border = "red"
+     )
+```
 
 
 ## Are there differences in activity patterns between weekdays and weekends?
+
