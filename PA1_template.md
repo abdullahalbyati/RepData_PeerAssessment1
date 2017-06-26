@@ -152,3 +152,4 @@ xyplot(activity_data_no_NA_agg$steps ~ activity_data_no_NA_agg$interval|activity
 ```
 
 ![](figures/adding weekday column-1.png)<!-- -->
+
