@@ -137,7 +137,8 @@ hist(steps_per_day_no_NA, xlab = "Sum of Steps Per Day with NAs replaced by 289"
 <hr class="separator"; style = "border-bottom:10px double orange;">
 ## Are there differences in activity patterns between weekdays and weekends?
 <hr class="separator"; style = "border-bottom:10px double orange;">
-```{r adding weekday column, echo=TRUE}
+
+```{r histogram with NA replaced, echo=TRUE}
 require("latttice")
 weekdays <- c("Monday", "Tuesday", "Wednesday", "Thursday", "Friday")
 activity_data_no_NA$weekday <- as.factor(ifelse(is.element(weekdays(as.Date(activity_data_no_NA$date)),weekdays), "Weekday", "Weekend"))
