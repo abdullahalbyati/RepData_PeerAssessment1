@@ -151,3 +151,4 @@ xyplot(activity_data_no_NA_agg$steps ~ activity_data_no_NA_agg$interval|activity
        )
 ```
 
+## The end
