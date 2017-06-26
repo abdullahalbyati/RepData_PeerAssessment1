@@ -151,5 +151,5 @@ activity_data_no_NA_agg <- aggregate(steps ~ interval + weekday, activity_data_n
 xyplot(activity_data_no_NA_agg$steps ~ activity_data_no_NA_agg$interval|activity_data_no_NA_agg$weekday, main = "Average Steps per Day by Interval",xlab="Interval", ylab="Steps",layout=c(1,2), type="l")
 ```
 
-![](figures/adding weekday column-1.png)<!-- -->
+![](figures/DOW.png)<!-- -->
 
